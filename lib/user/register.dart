@@ -107,7 +107,7 @@ class _Register extends State<Register> with TickerProviderStateMixin {
         "phonenumber":userInfo.phonenumber
       };
       databaseMethods.uploadUserInfo(userInfoMap);
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>Chatting()));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>Loginas()));
        setState(() {
       _isloading=false;
     });

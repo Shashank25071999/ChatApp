@@ -7,6 +7,7 @@ import 'package:chatApp/loginas.dart';
 
 class Chatting extends StatefulWidget {
   QuerySnapshot usersnapshot;
+  
   Chatting({this.usersnapshot});
   @override
   State<StatefulWidget> createState() {
