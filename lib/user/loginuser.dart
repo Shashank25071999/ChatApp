@@ -1,5 +1,9 @@
 
 
+import 'package:chatApp/services/auth.dart';
+import 'package:chatApp/services/database.dart';
+import 'package:chatApp/sharedprefrencesmethods/sharedprefrences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:chatApp/user/chatting.dart';
@@ -15,18 +19,48 @@ class UserAd extends StatefulWidget {
 GlobalKey<FormState> validatekey = GlobalKey<FormState>();
 
 class _UserAd extends State<UserAd> {
+  SharedPrefrences sharedPrefrences=SharedPrefrences();
+  DatabaseMethods databaseMethods=DatabaseMethods();
+  AuthMethods authMethods=AuthMethods();
+  bool _isloading=false;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   String username;
   String email;
   String pass;
   bool passwordVisible = true;
+  QuerySnapshot usersnapshot;
+   // user.documents.length    give the length of all the user
+  loginMeAsUser(String email, String password){
+    setState(() {
+      _isloading=true;
+    });
+    authMethods.signInWithEmailAndPassword(email, password).then((value) {
+
+        print("login return data ${value}");
+       databaseMethods.getUserByEmail(email).then((uservalue){
+         usersnapshot=uservalue;
+         print(usersnapshot.documents[0].data);
+          sharedPrefrences.setname(usersnapshot.documents[0].data["name"]);
+          sharedPrefrences.setemail(usersnapshot.documents[0].data["email"]);
+          sharedPrefrences.setusername(usersnapshot.documents[0].data["username"]);
+          sharedPrefrences.setphonenumber(usersnapshot.documents[0].data["phonenumber"]);
+         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>Chatting(usersnapshot: usersnapshot,)));
+         setState(() {
+           _isloading=false;
+         });
+
+       });
+      
+    });
+
+  }
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: Color(0xff1f1f1f),
-      body: Center(
+      body: _isloading?Container(child: Center(child:CircularProgressIndicator()),): Center(
             child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: SingleChildScrollView(
@@ -233,24 +267,9 @@ class _UserAd extends State<UserAd> {
                       GestureDetector(
                         onTap: () {
                           validatekey.currentState.save();
-                            if(username?.isEmpty??true)
-                                            {  _displaySnackBar(context, "Please enter your Username");
-                                          
-                                            }
-                                            else
-                                            if(email?.isEmpty??true)
-                                            {  _displaySnackBar(context, "Please enter your Email");
-                                          
-                                            }
-                                            else
-                                            if(username?.isEmpty??true)
-                                            {  _displaySnackBar(context, "Please enter your Password");
-                                          
-                                            }
-                                          else
-                                              {
-                                                Chatting();
-                                              }
+                            //TODO add snack bar code from below
+                            loginMeAsUser(email,pass);
+
                         },
                         child: Card(
                             color: Colors.cyanAccent[200],
@@ -301,3 +320,25 @@ class _UserAd extends State<UserAd> {
     _scaffoldKey.currentState.showSnackBar(snackBar);
   }
 }
+
+
+
+//TODO add snackbar code there
+// if(username?.isEmpty??true)
+//                                             {  _displaySnackBar(context, "Please enter your Username");
+                                          
+//                                             }
+//                                             else
+//                                             if(email?.isEmpty??true)
+//                                             {  _displaySnackBar(context, "Please enter your Email");
+                                          
+//                                             }
+//                                             else
+//                                             if(username?.isEmpty??true)
+//                                             {  _displaySnackBar(context, "Please enter your Password");
+                                          
+//                                             }
+//                                           else
+//                                               {
+//                                                 Chatting();
+//                                               }
