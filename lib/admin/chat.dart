@@ -1,7 +1,10 @@
 import 'package:chatApp/converstation/conversation.dart';
+import 'package:chatApp/loginregister.dart';
 import 'package:chatApp/services/database.dart';
+import 'package:chatApp/sharedprefrencesmethods/sharedprefrences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:chatApp/loginas.dart';
 import 'package:chatApp/modals/user.dart';
@@ -14,14 +17,14 @@ class AdminChatWithUserList extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
-    return _Chatting(username:user.name);
+    return _AdminChatting(username:user.name);
   }
 }
 
-class _Chatting extends State<AdminChatWithUserList> {
+class _AdminChatting extends State<AdminChatWithUserList> {
   DatabaseMethods databaseMethods = DatabaseMethods();
   String username;
-  _Chatting({this.username});
+  _AdminChatting({this.username});
 
   Stream chatroomstream;
   var snapshot2;
@@ -67,12 +70,15 @@ class _Chatting extends State<AdminChatWithUserList> {
         context: context,
         builder: (context) => AlertDialog(
               title: Text(
-                'Logout from app',
+                'Do you want to exit',
                 style: GoogleFonts.aBeeZee(color: Colors.black),
               ),
               actions: <Widget>[
                 FlatButton(
-                    onPressed: () => Navigator.pop(context, false),
+                    onPressed: () {
+                      print("exit app");
+                      SystemNavigator.pop();
+                    },
                     child: Text(
                       'OK',
                       style: GoogleFonts.aBeeZee(color: Colors.cyanAccent[300]),
@@ -82,8 +88,10 @@ class _Chatting extends State<AdminChatWithUserList> {
   }
 
   void handleClick(String value) {
+    SharedPrefrences pref=SharedPrefrences();
+                      pref.logout();
     Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => Loginas()),
+        MaterialPageRoute(builder: (context) => Loginregister()),
         (Route<dynamic> route) => false);
   }
 

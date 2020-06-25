@@ -2,11 +2,13 @@ import 'package:chatApp/services/database.dart';
 import 'package:flutter/material.dart';
 
 class Conversation extends StatefulWidget {
+  
   final String chatroomid;
   final String username;
   Conversation({this.chatroomid, this.username});
   @override
   State<StatefulWidget> createState() {
+    print(username);
     return _ConversationState();
   }
 }

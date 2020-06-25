@@ -1,5 +1,6 @@
 
 
+import 'package:chatApp/modals/user.dart';
 import 'package:chatApp/services/auth.dart';
 import 'package:chatApp/services/database.dart';
 import 'package:chatApp/sharedprefrencesmethods/sharedprefrences.dart';
@@ -44,7 +45,11 @@ class _UserAd extends State<UserAd> {
           sharedPrefrences.setemail(usersnapshot.documents[0].data["email"]);
           sharedPrefrences.setusername(usersnapshot.documents[0].data["username"]);
           sharedPrefrences.setphonenumber(usersnapshot.documents[0].data["phonenumber"]);
-         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>Chatting(usersnapshot: usersnapshot,)));
+          sharedPrefrences.setuserloginbool(true);
+          sharedPrefrences.setadminloginbool(false);
+          UserInfo user=UserInfo(name: usersnapshot.documents[0].data["name"],email:usersnapshot.documents[0].data["email"],username:usersnapshot.documents[0].data["username"],phonenumber: usersnapshot.documents[0].data["phonenumber"] );
+
+         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>Chatting(usersnapshot: usersnapshot,user: user,)));
          setState(() {
            _isloading=false;
          });

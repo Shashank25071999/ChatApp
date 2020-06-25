@@ -1,3 +1,4 @@
+import 'package:chatApp/sharedprefrencesmethods/sharedprefrences.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:chatApp/services/auth.dart';
@@ -29,7 +30,9 @@ class _LoginAd extends State<LoginAd> {
     setState(() {
       _isloading=true;
     });
-
+    SharedPrefrences sharedPrefrences=SharedPrefrences();
+    sharedPrefrences.setadminloginbool(true);
+    sharedPrefrences.setuserloginbool(false);
     authMethods.signInWithEmailAndPassword(email, password).then((value) {
       UserInfo user=UserInfo(email:email,username: "Admin",name: "Admin",phonenumber: "9984508400");
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>AdminChatWithUserList(user: user,)));

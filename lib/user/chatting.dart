@@ -1,18 +1,22 @@
 import 'package:chatApp/converstation/conversation.dart';
+import 'package:chatApp/loginregister.dart';
+import 'package:chatApp/modals/user.dart';
 import 'package:chatApp/services/database.dart';
+import 'package:chatApp/sharedprefrencesmethods/sharedprefrences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:chatApp/loginas.dart';
 
 class Chatting extends StatefulWidget {
   QuerySnapshot usersnapshot;
-  
-  Chatting({this.usersnapshot});
+  UserInfo user =UserInfo();
+  Chatting({this.usersnapshot,this.user});
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
-    return _Chatting(username: usersnapshot.documents[0].data["name"]);
+    return _Chatting(username: user.name);
   }
 }
 
@@ -28,10 +32,11 @@ class _Chatting extends State<Chatting> {
     return StreamBuilder(
         stream: chatroomstream,
         builder: (context, snapshot) {
-          print("snapshot data : ${snapshot.hasData}");
+
+          // print(snapshot.data.documents.length);
           return snapshot.hasData
               ? ListView.builder(
-                  itemCount: snapshot.data.documents.length,
+                  itemCount: 1,
                   itemBuilder: (context, index) {
                     return GestureDetector(
                       child: Chatroomtile(
@@ -52,7 +57,7 @@ class _Chatting extends State<Chatting> {
   }
 
   getuserinfo() async {
-    databaseMethods.getChatroom(username).then((value) {
+    databaseMethods.getChatroom(widget.user.name).then((value) {
       chatroomstream = value;
       setState(() {});
     });
@@ -68,7 +73,9 @@ class _Chatting extends State<Chatting> {
               ),
               actions: <Widget>[
                 FlatButton(
-                    onPressed: () => Navigator.pop(context, false),
+                    onPressed: () {
+                      SystemNavigator.pop();
+                    },
                     child: Text(
                       'OK',
                       style: GoogleFonts.aBeeZee(color: Colors.cyanAccent[300]),
@@ -78,8 +85,10 @@ class _Chatting extends State<Chatting> {
   }
 
   void handleClick(String value) {
+    SharedPrefrences pref=SharedPrefrences();
+                      pref.logout();
     Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => Loginas()),
+        MaterialPageRoute(builder: (context) => Loginregister()),
         (Route<dynamic> route) => false);
   }
 
@@ -93,11 +102,11 @@ class _Chatting extends State<Chatting> {
 
   createchatroomforuseradmin() {
     List<String> users = [
-      widget.usersnapshot.documents[0].data["name"],
+      username,
       "AdminName"
     ];
     String chatroomid = getchatroomid(
-        widget.usersnapshot.documents[0].data["email"], "admin@gmail.com");
+        widget.user.email, "admin@gmail.com");
     print(chatroomid);
     Map<String, dynamic> chatroommap = {
       "users": users,
@@ -110,7 +119,7 @@ class _Chatting extends State<Chatting> {
           MaterialPageRoute(
               builder: (context) => Conversation(
                     chatroomid: chatroomid,
-                    username: username,
+                    username: widget.user.name,
                   )));
     });
   }
