@@ -6,8 +6,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:chatApp/loginas.dart';
 import 'package:chatApp/modals/user.dart';
+import 'package:chatApp/admin/ChatTile/chatTile.dart';
 
 class AdminChatWithUserList extends StatefulWidget {
   QuerySnapshot usersnapshot;
@@ -42,6 +42,7 @@ class _AdminChatting extends State<AdminChatWithUserList> {
                     return GestureDetector(
                       child: Chatroomtile(
                         othername: snapshot.data.documents[index].data["name"],
+                        email:snapshot.data.documents[index].data["email"],
                       ),
                       onTap: () {
                         createchatroomforuseradmin(firstuser: "Admin",seconduser:snapshot.data.documents[index].data["name"],otheremail: snapshot.data.documents[index].data["email"] );
@@ -130,98 +131,53 @@ class _AdminChatting extends State<AdminChatWithUserList> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return WillPopScope(
-      onWillPop: () {
-        MoveToLastScreen();
-      },
-      child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-            backgroundColor:Color(0xff007EF4),
-            child: Icon(
-              Icons.chat,
-              color: Colors.black,
-            ),
-            onPressed: () {
-              // createchatroomforuseradmin();
-            }),
-        body: chatRoomList(),
+    return Scaffold(
+      
+      body: chatRoomList(),
+      backgroundColor: Color(0xff1f1f1f),
+      appBar: AppBar(elevation: 12,
+      
         backgroundColor: Color(0xff1f1f1f),
-        appBar: AppBar(
-          backgroundColor: Color(0xff1f1f1f),
-          automaticallyImplyLeading: false,
-          title: Text(
-            'CHAT',
-            style: GoogleFonts.aBeeZee(
-                color: Color(0xff007EF4),
-                fontWeight: FontWeight.bold,
-                fontSize: 20),
-          ),
-          centerTitle: true,
-          actions: <Widget>[
-            Theme(
-              data: Theme.of(context).copyWith(
-                cardColor: Color(0xff1f1f1f),
-              ),
-              child: PopupMenuButton<String>(
-                icon: Icon(
-                  Icons.more_vert,
-                  color: Colors.white,
-                ),
-                onSelected: handleClick,
-                itemBuilder: (BuildContext context) {
-                  return {'Logout'}.map((String choice) {
-                    return PopupMenuItem<String>(
-                      value: choice,
-                      child: Text(
-                        choice,
-                        style: GoogleFonts.aBeeZee(color: Colors.white),
-                      ),
-                    );
-                  }).toList();
-                },
-              ),
-            ),
-          ],
+        automaticallyImplyLeading: false,
+        title: Text(
+          'All Users',
+          style: GoogleFonts.aBeeZee(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 20),
         ),
+        centerTitle: true,
+        actions: <Widget>[
+          Theme(
+            data: Theme.of(context).copyWith(
+              cardColor: Color(0xff1f1f1f),
+            ),
+            child: PopupMenuButton<String>(
+              color: Colors.white,
+              icon: Icon(
+                Icons.more_vert,
+                color: Colors.white,
+              ),
+              onSelected: handleClick,
+              itemBuilder: (BuildContext context) {
+                return {'Logout'}.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(
+                      choice,
+                      style: GoogleFonts.aBeeZee(color: Colors.black),
+                    ),
+                  );
+                }).toList();
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class Chatroomtile extends StatelessWidget {
-  final String othername;
-  Chatroomtile({this.othername});
-
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    return Container(
-        margin: EdgeInsets.only(top: 22),
-        color: Color(0xff007EF4),
-        child: Row(
-          children: <Widget>[
-            Container(
-              width: 60,
-              height: 60,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  color: Colors.black, borderRadius: BorderRadius.circular(40)),
-              child: Text(
-                "${othername.substring(0, 1).toUpperCase()}",
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-            SizedBox(
-              width: 30,
-            ),
-            Text(
-              othername,
-              style: TextStyle(color: Colors.black),
-            )
-          ],
-        ));
-  }
-}
 
 // Container(height: 60,child: GestureDetector(onTap: (){
 //           print("message to admin connection build");

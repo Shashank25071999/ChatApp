@@ -1,6 +1,5 @@
-import 'package:chatApp/modals/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:provider/provider.dart';
+
 
 class DatabaseMethods {
   getUserByEmail(String email) async {

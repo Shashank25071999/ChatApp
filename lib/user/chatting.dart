@@ -1,3 +1,4 @@
+import 'package:chatApp/admin/ChatTile/chatTile.dart';
 import 'package:chatApp/converstation/conversation.dart';
 import 'package:chatApp/loginregister.dart';
 import 'package:chatApp/modals/user.dart';
@@ -11,8 +12,8 @@ import 'package:chatApp/loginas.dart';
 
 class Chatting extends StatefulWidget {
   QuerySnapshot usersnapshot;
-  UserInfo user =UserInfo();
-  Chatting({this.usersnapshot,this.user});
+  UserInfo user = UserInfo();
+  Chatting({this.usersnapshot, this.user});
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
@@ -32,7 +33,6 @@ class _Chatting extends State<Chatting> {
     return StreamBuilder(
         stream: chatroomstream,
         builder: (context, snapshot) {
-
           // print(snapshot.data.documents.length);
           return snapshot.hasData
               ? ListView.builder(
@@ -41,6 +41,7 @@ class _Chatting extends State<Chatting> {
                     return GestureDetector(
                       child: Chatroomtile(
                         othername: "Admin",
+                        email: "admin@gmail.com",
                       ),
                       onTap: () {
                         createchatroomforuseradmin();
@@ -85,8 +86,8 @@ class _Chatting extends State<Chatting> {
   }
 
   void handleClick(String value) {
-    SharedPrefrences pref=SharedPrefrences();
-                      pref.logout();
+    SharedPrefrences pref = SharedPrefrences();
+    pref.logout();
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => Loginregister()),
         (Route<dynamic> route) => false);
@@ -101,17 +102,14 @@ class _Chatting extends State<Chatting> {
   }
 
   createchatroomforuseradmin() {
-    List<String> users = [
-      username,
-      "AdminName"
-    ];
-    String chatroomid = getchatroomid(
-        widget.user.email, "admin@gmail.com");
+    List<String> users = [username, "AdminName"];
+    String chatroomid = getchatroomid(widget.user.email, "admin@gmail.com");
     print(chatroomid);
     Map<String, dynamic> chatroommap = {
       "users": users,
       "chatroomid": chatroomid
     };
+    
 
     databaseMethods.createchatroom(chatroomid, chatroommap).then((value) {
       Navigator.push(
@@ -127,96 +125,56 @@ class _Chatting extends State<Chatting> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return WillPopScope(
-      onWillPop: () {
-        MoveToLastScreen();
-      },
-      child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-            backgroundColor:Color(0xff007EF4),
-            child: Icon(
-              Icons.chat,
-              color: Colors.black,
-            ),
-            onPressed: () {
-              createchatroomforuseradmin();
-            }),
-        body: chatRoomList(),
-        backgroundColor: Color(0xff1f1f1f),
-        appBar: AppBar(
-          backgroundColor: Color(0xff1f1f1f),
-          automaticallyImplyLeading: false,
-          title: Text(
-            'CHAT',
-            style: GoogleFonts.aBeeZee(
-                color: Color(0xff007EF4),
-                fontWeight: FontWeight.bold,
-                fontSize: 20),
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.white,
+          child: Icon(
+            Icons.chat,
+            color: Colors.black,
           ),
-          centerTitle: true,
-          actions: <Widget>[
-            Theme(
-              data: Theme.of(context).copyWith(
-                cardColor: Color(0xff1f1f1f),
-              ),
-              child: PopupMenuButton<String>(
-                icon: Icon(
-                  Icons.more_vert,
-                  color: Colors.white,
-                ),
-                onSelected: handleClick,
-                itemBuilder: (BuildContext context) {
-                  return {'Logout'}.map((String choice) {
-                    return PopupMenuItem<String>(
-                      value: choice,
-                      child: Text(
-                        choice,
-                        style: GoogleFonts.aBeeZee(color: Colors.white),
-                      ),
-                    );
-                  }).toList();
-                },
-              ),
-            ),
-          ],
+          onPressed: () {
+            createchatroomforuseradmin();
+          }),
+      body: chatRoomList(),
+      backgroundColor: Color(0xff1f1f1f),
+      appBar: AppBar(
+        backgroundColor: Color(0xff1f1f1f),
+        automaticallyImplyLeading: false,
+        title: Text(
+          'Admin Conversation',
+          style: GoogleFonts.aBeeZee(
+            color: Colors.white,
+          ),
         ),
+        centerTitle: true,
+        actions: <Widget>[
+          Theme(
+            data: Theme.of(context).copyWith(
+              cardColor: Color(0xff1f1f1f),
+            ),
+            child: PopupMenuButton<String>(
+              color: Colors.white,
+              icon: Icon(
+                Icons.more_vert,
+                color: Colors.white,
+              ),
+              onSelected: handleClick,
+              itemBuilder: (BuildContext context) {
+                return {'Logout'}.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(
+                      choice,
+                      style: GoogleFonts.aBeeZee(color: Colors.black),
+                    ),
+                  );
+                }).toList();
+              },
+            ),
+          ),
+        ],
       ),
     );
-  }
-}
-
-class Chatroomtile extends StatelessWidget {
-  final String othername;
-  Chatroomtile({this.othername});
-
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    return Container(
-        margin: EdgeInsets.only(top: 22),
-        color: Color(0xff007EF4),
-        child: Row(
-          children: <Widget>[
-            Container(
-              width: 60,
-              height: 60,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  color: Colors.black, borderRadius: BorderRadius.circular(40)),
-              child: Text(
-                "${othername.substring(0, 1).toUpperCase()}",
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-            SizedBox(
-              width: 30,
-            ),
-            Text(
-              othername,
-              style: TextStyle(color: Colors.black),
-            )
-          ],
-        ));
   }
 }
 

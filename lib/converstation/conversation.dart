@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:chatApp/services/database.dart';
 import 'package:flutter/material.dart';
+import 'package:chatApp/converstation/MessageTile/messageTile.dart';
+import 'package:chatApp/Widget/widget.dart';
 
 class Conversation extends StatefulWidget {
   
@@ -16,8 +20,20 @@ class Conversation extends StatefulWidget {
 class _ConversationState extends State<Conversation> {
   DatabaseMethods databaseMethods = DatabaseMethods();
   Stream chatmessagestream;
+  ScrollController _controller;
+  // void _scrolltobottom(){
+  //   if(_controller.hasClients){
+  //     _controller.animateTo(_controller.position.maxScrollExtent, duration: Duration(milliseconds: 300), curve: Curves.elasticOut);
 
+  //   }else{
+  //     Timer(Duration(milliseconds: 400), ()=>_scrolltobottom);
+  //   }
+    
+
+    
+  // }
   void initState() {
+     _controller=ScrollController();
     databaseMethods.getConversationMessages(widget.chatroomid).then((value) {
       setState(() {
         chatmessagestream = value;
@@ -32,6 +48,8 @@ class _ConversationState extends State<Conversation> {
         builder: (context, snapshot) {
           return snapshot.hasData
               ? ListView.builder(
+                controller: _controller,
+                reverse: true,
                   itemCount: snapshot.data.documents.length,
                   itemBuilder: (context, index) {
                     return MessageTile(
@@ -59,92 +77,53 @@ class _ConversationState extends State<Conversation> {
   TextEditingController textmessagecontroller = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    // WidgetsBinding.instance.addPostFrameCallback((timeStamp) =>_scrolltobottom());
     // TODO: implement build
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Admin Conversation"),
-        ),
+        appBar:appBarMain(context, "Admin Conversation"),
         backgroundColor: Colors.black,
         body: Container(
-            child: Stack(
-          children: <Widget>[
-            ChatmessageList(),
-            Container(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                  color: Color(0x54FFFFFF),
-                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                          child: TextField(
-                        controller: textmessagecontroller,
-                        style: TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                            hintText: "Write message...",
-                            hintStyle: TextStyle(color: Colors.white54),
-                            border: InputBorder.none),
+            child: Column(
+              children: <Widget>[
+                Expanded(child: ChatmessageList()),
+                Container(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                      color: Colors.black,
+                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                              child: TextField(
+                            controller: textmessagecontroller,
+                            style: TextStyle(color: Colors.white),
+                            decoration: InputDecoration(
+                                hintText: "Write message...",
+                                hintStyle: TextStyle(color: Colors.white),
+                                border: InputBorder.none),
+                          )),
+                          GestureDetector(
+                            onTap: () {
+                              print(textmessagecontroller.text);
+                              sendmessage();
+                            },
+                            child: Center(
+                              child: Container(
+                                height: 40,
+                                width: 40,
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(40)),
+                                padding: EdgeInsets.all(12),
+                                child: Center(child: Icon(Icons.send)),
+                              ),
+                            ),
+                          )
+                        ],
                       )),
-                      GestureDetector(
-                        onTap: () {
-                          print(textmessagecontroller.text);
-                          sendmessage();
-                        },
-                        child: Container(
-                          height: 40,
-                          width: 40,
-                          decoration: BoxDecoration(
-                              gradient: LinearGradient(colors: [
-                                Color(0x36FFFFFF),
-                                Color(0x0FFFFFFF)
-                              ]),
-                              borderRadius: BorderRadius.circular(40)),
-                          padding: EdgeInsets.all(12),
-                          child: Icon(Icons.send),
-                        ),
-                      )
-                    ],
-                  )),
-            )
-          ],
-        )));
+                ),
+              ],
+            )));
   }
 }
 
-class MessageTile extends StatelessWidget {
-  final String message;
-  final bool issendby;
-  MessageTile({this.message, this.issendby});
-  @override
-  Widget build(BuildContext context) {
-    return Container(padding: EdgeInsets.only(left:issendby? 0:20, right:issendby?20:0),
-      margin: EdgeInsets.symmetric(vertical: 8),
-      width: MediaQuery.of(context).size.width,
-      alignment: issendby ? Alignment.centerRight : Alignment.bottomLeft,
-      child: Container(
-        decoration: BoxDecoration(
-            gradient: LinearGradient(
-                colors: issendby
-                    ? [const Color(0xff007EF4), const Color(0xff2A75BC)]
-                    : [
-                        const Color(0x1AFFFFFF),
-                        const Color(0X1AFFFFFF),
-                      ]),
-            borderRadius: issendby
-                ? BorderRadius.only(
-                    topLeft: Radius.circular(23),
-                    topRight: Radius.circular(23),
-                    bottomLeft: Radius.circular(23))
-                : BorderRadius.only(
-                    topLeft: Radius.circular(23),
-                    topRight: Radius.circular(23),
-                    bottomRight: Radius.circular(23))),
-        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: Text(
-          message,
-          style: TextStyle(color: Colors.white, fontSize: 15),
-        ),
-      ),
-    );
-  }
-}
